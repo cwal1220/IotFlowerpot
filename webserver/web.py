@@ -64,7 +64,7 @@ def get_record(device_id, start_time, end_time):
 		temp['temperature'] = float(temp['temperature'])
 		temp['humidity'] = float(temp['humidity'])
 		temp['dirt'] = float(temp['dirt'])
-		temp['timestamp'] = datetime.utcfromtimestamp(int(i['timestamp'])/1000).strftime('%Y-%m-%d %H:%M:%S')
+		temp['timestamp'] = datetime.utcfromtimestamp(int(i['timestamp'])/1000 + 32400).strftime('%Y-%m-%d %H:%M:%S')
 		data_list.append(temp)
 	data['data'] = data_list
 

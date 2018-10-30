@@ -75,7 +75,7 @@ void drawTempHumi(String temperature, String humidity, String dirt)
   display.drawString(2, 1, "- Temperature");
   display.drawString(30, 11, temperature + " oC");
   display.drawString(2, 22, "- Humidity");
-  display.drawString(30, 32, humidity + "%");
+  display.drawString(30, 32, humidity + " %");
   display.drawString(2, 43, "- Dirt Humidity");
   display.drawString(30, 53, dirt + " %");
   display.display();
@@ -218,7 +218,7 @@ void loop() {
     String temperature = String(dht.getTemperature());
     String dirt = String( ((1024 - analogRead(A0)) * 100) / 1024 );
     drawTempHumi(temperature, humidity, dirt);
-    if(loop_count >= 10)
+    if(loop_count >= 15)
     {
       if (client.isConnected()) 
       {
