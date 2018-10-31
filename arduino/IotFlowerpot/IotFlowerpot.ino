@@ -211,7 +211,7 @@ void setup() {
 }
 
 void loop() {
-
+//  client.loop();
   if(!captive) // Not Captive
   {
     String humidity = String(dht.getHumidity());

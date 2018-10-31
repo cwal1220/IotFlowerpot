@@ -47,7 +47,7 @@ time.sleep(2)
 def getUnixTime(datetime_str):
 	time_tuple = time.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
 	print(int(time.mktime(time_tuple)) * 1000)
-	return int(time.mktime(time_tuple)) * 1000
+	return (int(time.mktime(time_tuple)) - 32400) * 1000
 
 
 
@@ -64,7 +64,8 @@ def get_record(device_id, start_time, end_time):
 		temp['temperature'] = float(temp['temperature'])
 		temp['humidity'] = float(temp['humidity'])
 		temp['dirt'] = float(temp['dirt'])
-		temp['timestamp'] = datetime.utcfromtimestamp(int(i['timestamp'])/1000 + 32400).strftime('%Y-%m-%d %H:%M:%S')
+		# temp['timestamp'] = datetime.utcfromtimestamp(int(i['timestamp'])/1000 + 32400).strftime('%Y-%m-%d %H:%M:%S')
+		temp['timestamp'] = int(temp['timestamp'])
 		data_list.append(temp)
 	data['data'] = data_list
 
