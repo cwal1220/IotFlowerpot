@@ -155,15 +155,11 @@ public class MainActivity extends AppCompatActivity implements DBRequester.Liste
 
                     JSONArray jsonArray = json.getJSONObject("data").getJSONArray("data");
                     for (int i = 0; i < jsonArray.length(); i++) {
-
-
-//                            Date zdate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(jsonArray.getJSONObject(i).get("timestamp").toString());
-//                            temperature_entries.add(new Entry(zdate.getTime() % 86400000, (float) jsonArray.getJSONObject(i).getDouble("temperature")));
-//                            humidity_entries.add(new Entry(zdate.getTime() % 86400000, (float) jsonArray.getJSONObject(i).getDouble("humidity")));
-                        dirt_entries.add(new Entry(jsonArray.getJSONObject(i).getInt("timestamp"), (float) jsonArray.getJSONObject(i).getDouble("dirt")));
-                        temperature_entries.add(new Entry(jsonArray.getJSONObject(i).getInt("timestamp"), (float) jsonArray.getJSONObject(i).getDouble("temperature")));
-                        humidity_entries.add(new Entry(jsonArray.getJSONObject(i).getInt("timestamp"), (float) jsonArray.getJSONObject(i).getDouble("humidity")));
-                        dirt_entries.add(new Entry(jsonArray.getJSONObject(i).getInt("timestamp"), (float) jsonArray.getJSONObject(i).getDouble("dirt")));
+                        int timestamp = jsonArray.getJSONObject(i).getInt("timestamp") - 1140000 ;
+                        dirt_entries.add(new Entry(timestamp , (float) jsonArray.getJSONObject(i).getDouble("dirt")));
+                        temperature_entries.add(new Entry(timestamp, (float) jsonArray.getJSONObject(i).getDouble("temperature")));
+                        humidity_entries.add(new Entry(timestamp, (float) jsonArray.getJSONObject(i).getDouble("humidity")));
+                        dirt_entries.add(new Entry(timestamp, (float) jsonArray.getJSONObject(i).getDouble("dirt")));
 
 
                     }
