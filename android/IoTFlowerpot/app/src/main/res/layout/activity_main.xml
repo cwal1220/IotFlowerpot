@@ -70,15 +70,10 @@
                     android:gravity="center_horizontal"
                     android:text="Device ID" />
 
-                <EditText
-                    android:id="@+id/editText_deviceId"
+                <Button
+                    android:id="@+id/button_deviceId"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:contentDescription="장치명"
-                    android:ems="10"
-                    android:gravity="center_horizontal"
-                    android:inputType="textPersonName"
                     android:text="ESP_0042D6CD" />
 
                 <Button

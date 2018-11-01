@@ -2,12 +2,15 @@ package com.example.kpu.iotflowerpot;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,8 +34,8 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements DBRequester.Listener{
 
-    Button button_search, button_date, button_water;
-    TextView textView_date, textView_deviceId;
+    Button button_search, button_date, button_water, button_deviceId;
+    TextView textView_date;
     String datetime;
     DatePickerDialog datePickerDialog;
     // LineChart
@@ -53,8 +56,8 @@ public class MainActivity extends AppCompatActivity implements DBRequester.Liste
         button_water        = findViewById(R.id.button_water);
         button_search       = findViewById(R.id.button_search);
         button_date         = findViewById(R.id.button_date);
+        button_deviceId     = findViewById(R.id.button_deviceId);
         textView_date       = findViewById(R.id.textView_date);
-        textView_deviceId   = findViewById(R.id.editText_deviceId);
         textView_date.setText(datetime);
 
         // Progress Bar
@@ -84,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements DBRequester.Liste
 
                 try {
                     JSONObject param = new JSONObject();
-                    param.put("device_id", textView_deviceId.getText().toString());
+                    param.put("device_id", button_deviceId.getText().toString());
                     param.put("start_time", textView_date.getText() + " 00:00:00");
                     param.put("end_time", textView_date.getText() + " 23:59:59");
                     new DBRequester.Builder(MainActivity.this, "http://52.78.239.38:5000", MainActivity.this)
@@ -108,12 +111,32 @@ public class MainActivity extends AppCompatActivity implements DBRequester.Liste
         });
 
 
+        button_deviceId.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder ad = new AlertDialog.Builder(MainActivity.this);
+                final EditText et = new EditText(MainActivity.this);
+                et.setText(button_deviceId.getText());
+                ad.setView(et);
+                ad.setTitle("Device ID");       // 제목 설정
+                ad.setMessage("장치의 ID를 입력하세요");   // 내용 설정
+
+                ad.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        button_deviceId.setText(et.getText());
+                    }
+                });
+                ad.show();
+            }
+        });
+
         button_water.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
                     JSONObject param = new JSONObject();
-                    param.put("device_id", textView_deviceId.getText().toString());
+                    param.put("device_id", button_deviceId.getText().toString());
                     new DBRequester.Builder(MainActivity.this, "http://52.78.239.38:5000", MainActivity.this)
                             .attach("request/led")
                             .streamPost(param)
@@ -174,11 +197,13 @@ public class MainActivity extends AppCompatActivity implements DBRequester.Liste
                         lineData.addDataSet(lineDataSet_dirt);
                         lineDataSet_temp.setColor(Color.RED);
                         lineDataSet_temp.setCircleColor(Color.RED);
+                        lineDataSet_temp.setDrawCircles(false);
                         lineDataSet_humi.setColor(Color.BLUE);
                         lineDataSet_humi.setCircleColor(Color.BLUE);
+                        lineDataSet_humi.setDrawCircles(false);
                         lineDataSet_dirt.setColor(Color.GREEN);
                         lineDataSet_dirt.setCircleColor(Color.GREEN);
-
+                        lineDataSet_dirt.setDrawCircles(false);
                         lineChart.getXAxis().setValueFormatter(new IAxisValueFormatter() {
 
                             private SimpleDateFormat mFormat = new SimpleDateFormat("HH:mm:ss");
