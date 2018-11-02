@@ -31,6 +31,10 @@ char led_topic[50];
 int loop_count = 0;
 bool captive = true;
 
+float temp_sum = 0;
+float humi_sum = 0;
+float dirt_sum = 0;
+
 // See `src/aws_iot_config.h` for formatting
 char *region = (char *) "ap-northeast-2";
 char *endpoint = (char *) "a1nac6uq3iham1-ats";
@@ -77,6 +81,20 @@ void drawTempHumi(String temperature, String humidity, String dirt)
   display.drawString(2, 22, "- Humidity");
   display.drawString(30, 32, humidity + " %");
   display.drawString(2, 43, "- Dirt Humidity");
+  display.drawString(30, 53, dirt + " %");
+  display.display();
+}
+
+void drawGiveMeWater(String dirt) 
+{
+  display.clear();
+  display.setTextAlignment(TEXT_ALIGN_LEFT);
+  display.setFont(ArialMT_Plain_10);
+  display.drawString(2, 1, "!!Beep Beep Beep!!");
+  display.setFont(ArialMT_Plain_16);
+  display.drawString(15, 25, "Give Me Water!");
+  display.setFont(ArialMT_Plain_10);
+  display.drawString(2, 43, "- Current Humidity");
   display.drawString(30, 53, dirt + " %");
   display.display();
 }
@@ -176,6 +194,9 @@ void setup() {
       if(prog_per > 1500)
         initDevice();
     }
+    temp_sum = (float)dht.getTemperature();
+    humi_sum = (float)dht.getHumidity();
+    dirt_sum = (1024.0 - (float)analogRead(A0)) * 100.0 / 1024.0 ;
     drawProgressBar(100);
     if (MDNS.begin(device_id))
       Serial.println("MDNS responder started");
@@ -214,15 +235,25 @@ void loop() {
 //  client.loop();
   if(!captive) // Not Captive
   {
-    String humidity = String(dht.getHumidity());
-    String temperature = String(dht.getTemperature());
-    String dirt = String( ((1024 - analogRead(A0)) * 100) / 1024 );
-    drawTempHumi(temperature, humidity, dirt);
+    temp_sum = (temp_sum * 7.0 + (float)dht.getTemperature()) / 8.0;
+    humi_sum = (humi_sum * 7.0 + (float)dht.getHumidity()) / 8.0;
+    dirt_sum = (dirt_sum * 7.0 + ((1024.0 - (float)analogRead(A0)) * 100.0) / 1024.0) / 8.0 ;
+    
+    drawTempHumi(String(temp_sum), String(humi_sum), String(dirt_sum));
+
+    if(dirt_sum <= 10.0)
+    {
+      //give me water
+      drawGiveMeWater(String(dirt_sum));
+      digitalWrite(D8, HIGH);
+    } else {
+      digitalWrite(D8, LOW);
+    }
     if(loop_count >= 15)
     {
       if (client.isConnected()) 
       {
-        String shadow = "{\"state\": {\"reported\": {\"foo\" : \"bar\"}}, \"device_id\": \"" + String(device_id) + "\", \"temperature\" : " + temperature + ", \"humidity\" : " + humidity + ", \"dirt\" : " + dirt + "}";
+        String shadow = "{\"state\": {\"reported\": {\"foo\" : \"bar\"}}, \"device_id\": \"" + String(device_id) + "\", \"temperature\" : " + String(temp_sum) + ", \"humidity\" : " + String(humi_sum) + ", \"dirt\" : " + String(dirt_sum) + "}";
         client.publish(aws_topic, shadow.c_str(), 0, false);
         client.yield();
       }
@@ -230,6 +261,7 @@ void loop() {
       {
         Serial.println("Not connected...");
         delay(2000);
+        ESP.restart();
       }
       loop_count = 0;
     }
