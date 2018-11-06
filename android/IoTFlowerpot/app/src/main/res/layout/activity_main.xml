@@ -74,7 +74,7 @@
                     android:id="@+id/button_deviceId"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ESP_0042D6CD" />
+                    android:text="ESP_001D920C" />
 
                 <Button
                     android:id="@+id/button_water"

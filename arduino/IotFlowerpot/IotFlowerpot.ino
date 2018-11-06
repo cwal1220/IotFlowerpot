@@ -40,8 +40,8 @@ char *region = (char *) "ap-northeast-2";
 char *endpoint = (char *) "a1nac6uq3iham1-ats";
 char *mqttHost = (char *) "a1nac6uq3iham1-ats.iot.ap-northeast-2.amazonaws.com";
 int mqttPort = 443;
-char *iamKeyId = (char *) "AKIAJOHWOO5AAOXZLYBQ";
-char *iamSecretKey = (char *) "b9zXHYJoh0AU0Sb8c0iTpAF1ARe3//ZtiSJURrZV";
+char *iamKeyId = (char *) "your IAM ID";
+char *iamSecretKey = (char *) "your IAM Secret Key";
 const char* aws_topic  = "$aws/things/ESP8266/shadow/update";
  
 ESP8266DateTimeProvider dtp;
@@ -156,14 +156,17 @@ void setup() {
   Serial.begin(115200);
   // EEPROM Init
   EEPROM.begin(EEPROM_LENGTH);
-  // Flash button -> Init button
-  pinMode(D1, INPUT_PULLUP);
-//  digitalWrite(D1, HIGH);
-  attachInterrupt(D1, initDevice, FALLING);
+//  // Flash button -> Init button
+//  pinMode(D1, INPUT_PULLUP);
+////  digitalWrite(D1, HIGH);
+//  attachInterrupt(D1, initDevice, FALLING);
   // LED Init
   pinMode(D8, OUTPUT);
+  pinMode(D6, OUTPUT);
   // DHT11 Init
-  dht.setup(2);
+
+  dht.setup(D2, DHTesp::DHT22);
+
   while(!Serial) {
       yield();
   }
@@ -214,13 +217,13 @@ void setup() {
           Serial.println("Subscribe!");
           if(strcmp(msg, "LED_ON") == 0)
           {
-            digitalWrite(D8, HIGH);
+            digitalWrite(D6, HIGH);
             drawSubInfo(String(topic), String(msg));
             delay(3000);
-            digitalWrite(D8, LOW);
+            digitalWrite(D6, LOW);
           }
           else
-            digitalWrite(D8, LOW);
+            digitalWrite(D6, LOW);
           
 
 
@@ -235,9 +238,19 @@ void loop() {
 //  client.loop();
   if(!captive) // Not Captive
   {
-    temp_sum = (temp_sum * 7.0 + (float)dht.getTemperature()) / 8.0;
-    humi_sum = (humi_sum * 7.0 + (float)dht.getHumidity()) / 8.0;
-    dirt_sum = (dirt_sum * 7.0 + ((1024.0 - (float)analogRead(A0)) * 100.0) / 1024.0) / 8.0 ;
+    float temp_temperature = dht.getTemperature();
+    float temp_humidity = dht.getHumidity();
+    Serial.println("Temp : "+ String(temp_temperature) + ", Humi : " + String(temp_humidity));  
+    if(temp_temperature != NULL && temp_humidity != NULL)
+    {
+      temp_sum = (temp_sum * 7.0 + temp_temperature) / 8.0;
+      humi_sum = (humi_sum * 7.0 + temp_humidity) / 8.0;
+      dirt_sum = (dirt_sum * 7.0 + ((1024.0 - (float)analogRead(A0)) * 100.0) / 1024.0) / 8.0 ;
+    }
+//    temp_sum = (temp_sum * 7.0 + (float)dht.getTemperature()) / 8.0;
+//    humi_sum = (humi_sum * 7.0 + (float)dht.getHumidity()) / 8.0;
+//    dirt_sum = (dirt_sum * 7.0 + ((1024.0 - (float)analogRead(A0)) * 100.0) / 1024.0) / 8.0 ;
+
     
     drawTempHumi(String(temp_sum), String(humi_sum), String(dirt_sum));
 
