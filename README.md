@@ -12,3 +12,6 @@ ESP8266 + AWS + Android
 2. DHT11
 3. 워터펌프
 4. 토양 습도센서
+
+## 시연영상
+https://youtu.be/3VKiqapLrX4
